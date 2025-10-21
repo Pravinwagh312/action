@@ -1,0 +1,79 @@
+Create a shell script to automate below procedure
+
+--------------------------------
+
+login ubuntu VM 
+---------------
+10.52.52.xx
+user=abc
+passowrd abc@123
+----
+ls
+cd docker_deploy
+---
+mkdir 17sept_deploy
+cd 17sept_deploy
+---
+git clone ----kpit1@LD-192L:~/docker_deploy/17sept_deploy$ git clone -b regex-registration https://gitlab.kpit.com/cicd-framework-and-kpi/cicd-framework/dashboard.git
+Cloning into 'dashboard'...
+enter user ----Username for 'https://gitlab.kpit.com': pravinw2
+enter passowrd---Password for 'https://pravinw2@gitlab.kpit.com':
+
+
+
+----------------------------------------------
+
+frontend image build process
+--------------------------------------------
+cd /home/kpit1/docker_deploy/17oct_deploy/dashboard/dashboard_UI/
+rm -rf Dockerfile
+cp /home/kpit1/docker_deploy/reference_deploy/dashboard/dashboard_UI/Dockerfile /home/kpit1/docker_deploy/17oct_deploy/dashboard/dashboard_UI/
+cd ~/docker_deploy/17oct_deploy/dashboard/dashboard_UI/src/environments/
+sudo nano environment.development.ts
+
+export const environment = {
+  production: false,
+  apiUrl: 'http://10.52.52.xx:8080',
+};
+
+
+sudo nano environment.ts
+export const environment = {
+  production: false,
+  apiUrl: 'http://10.52.52.xx:8080',
+};
+
+cd /home/kpit1/docker_deploy/17oct_deploy/dashboard/dashboard_UI/
+docker build -t 17oct_ui --no-cache .
+where image name started with date and concatenated with sept_ui for frontend service
+
+----------------------------------------------
+
+backend image build process
+--------------------------------------------
+
+cd /home/kpit1/docker_deploy/17oct_deploy/dashboard/backend-quarkus
+rm -rf Dockerfile
+cp /home/kpit1/docker_deploy/reference_deploy/dashboard/backend-quarkus/Dockerfile /home/kpit1/docker_deploy/17oct_deploy/dashboard/backend-quarkus/
+cd /home/kpit1/docker_deploy/10oct_deploy/dashboard/backend-quarkus/src/main/resources/
+rm -rf application.properties
+
+cp /home/kpit1/docker_deploy/reference_deploy/dashboard/backend-quarkus/src/main/resources/application.properties /home/kpit1/docker_deploy/17oct_deploy/dashboard/backend-quarkus/src/main/resources/
+
+cd /home/kpit1/docker_deploy/17oct_deploy/dashboard/backend-quarkus/
+docker build -t 17oct_bk --no-cache .
+
+where image name started with date and concatenated with octt_bk for backend service
+
+--------------------------------------------
+up container from docker-compose 
+
+-------------------------------------------------
+after building both images follow below steps
+go to 
+cd /home/kpit1/docker_deploy
+cd 23jan_new_deploy
+docker compose stop frontend
+sudo nano docker-compose.yml---->>>change image name of service frontend and backend
+docker compose up frontend backend -d
+docker ps
